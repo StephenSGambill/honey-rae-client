@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, fetchIt } from "react"
 import { useNavigate } from "react-router-dom"
 import { isStaff } from "../../utils/isStaff"
 import { TicketCard } from "./TicketCard"
 import { getAllTickets, searchTicketsByStatus } from "../../managers/TicketManager"
+import { getToken } from "../../utils/getToken"
 import "./Tickets.css"
+
 
 export const TicketList = () => {
   const [active, setActive] = useState("")
@@ -35,8 +37,18 @@ export const TicketList = () => {
   }
 
   const filterTickets = (status) => {
-    searchTicketsByStatus(status).then((res) => setTickets(res))
+    fetch(`http://localhost:8000/tickets?status=${status}`, {
+      headers: {
+        Authorization: `Token ${getToken()}`
+      }
+    })
+      .then(res => res.json())
+      .then((tickets) => {
+        setTickets(tickets)
+      })
+      .catch(() => setTickets([]))
   }
+
 
   return <>
     <div>
