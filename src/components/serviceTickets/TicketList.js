@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import { isStaff } from "../../utils/isStaff"
 import { TicketCard } from "./TicketCard"
 import { getAllTickets, searchTicketsByStatus } from "../../managers/TicketManager"
-import { getToken } from "../../utils/getToken"
 import "./Tickets.css"
 
 
@@ -37,12 +36,7 @@ export const TicketList = () => {
   }
 
   const filterTickets = (status) => {
-    fetch(`http://localhost:8000/tickets?status=${status}`, {
-      headers: {
-        Authorization: `Token ${getToken()}`
-      }
-    })
-      .then(res => res.json())
+    searchTicketsByStatus(status)
       .then((tickets) => {
         setTickets(tickets)
       })
@@ -51,9 +45,14 @@ export const TicketList = () => {
 
 
   return <>
+
     <div>
-      <button onClick={() => filterTickets("done")}>Show Done</button>
-      <button onClick={() => filterTickets("all")}>Show All</button>
+      {isStaff() && (
+        <div>
+          <button onClick={() => filterTickets("done")}>Show Done</button>
+          <button onClick={() => filterTickets("all")}>Show All</button>
+        </div>
+      )}
     </div>
     <div className="actions">{toShowOrNotToShowTheButton()}</div>
     <div className="activeTickets">{active}</div>
