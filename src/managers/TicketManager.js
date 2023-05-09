@@ -59,3 +59,13 @@ export const deleteTicket = (id) => {
   }
   )
 }
+
+export const searchTicketsByDescription = (description) => {
+  return fetch(`http://localhost:8000/tickets?description=${description}`,
+    {
+      headers: {
+        Authorization: `Token ${getToken()}`
+      }
+    })
+    .then((response) => response.json())
+}

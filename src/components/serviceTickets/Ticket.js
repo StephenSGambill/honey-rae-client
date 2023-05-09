@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { isStaff } from "../../utils/isStaff"
 import { getAllEmployees } from "../../managers/EmployeeManager"
 import { getTicketById, deleteTicket, updateTicket } from "../../managers/TicketManager"
+import { dateConverter } from "../../utils/dateConverter"
 
 export const Ticket = () => {
   const [ticket, setTicket] = useState({})
@@ -37,8 +38,20 @@ export const Ticket = () => {
       ...ticket,
       employee: parseInt(evt.target.value)
     }
-
     updateTicket(updatedTicket).then(() => fetchTicket())
+
+  }
+
+  const completeTicketEvent = () => {
+    // console.log(parseInt(evt.target.value))
+    const newDate = dateConverter()
+    const updatedTicket = {
+      ...ticket,
+      employee: ticket.employee.id,
+      date_completed: newDate
+    }
+    updateTicket(updatedTicket).then(() => fetchTicket())
+    navigate("/")
   }
 
   const ticketStatus = () => {
@@ -74,14 +87,14 @@ export const Ticket = () => {
   return (
     <>
       <section className="ticket">
-        <h3 className="ticket__description">Description</h3>
+        <h3 className="ticket__description">Description Ticket - {ticket.id}</h3>
         <div>{ticket.description}</div>
 
         <footer className="ticket__footer ticket__footer--detail">
           <div className=" footerItem">Submitted by {ticket.customer?.full_name}</div>
           <div className="ticket__employee footerItem">
             {
-              ticket.date_completed === null
+              ticket.date_completed === null && isStaff()
                 ? employeePicker()
                 : `Completed by ${ticket.employee?.full_name} on ${ticket.date_completed}`
             }
@@ -90,8 +103,8 @@ export const Ticket = () => {
             {ticketStatus()}
           </div>
           {
-            isStaff()
-              ? <></>
+            ticket.date_completed === null && isStaff()
+              ? <button className="btn-4" onClick={completeTicketEvent}>Mark Done</button>
               : <button onClick={deleteTicketEvent}>Delete</button>
           }
         </footer>
